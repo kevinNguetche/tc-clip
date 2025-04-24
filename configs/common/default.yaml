@@ -5,7 +5,7 @@ base: null
 
 k400:
   dataset_name: kinetics400
-  root: /YOUR/PATH/TO/DATASET/k400
+  root: ../k400_resize/
   num_classes:
     default: 400
     base: 200
@@ -62,7 +62,7 @@ k600:
 
 hmdb51:
   dataset_name: hmdb51
-  root: /YOUR/PATH/TO/DATASET/hmdb51
+  root: ../
   num_classes:
     default: 51
     base: 26
@@ -76,6 +76,10 @@ hmdb51:
     base_llm: labels/labels_froster/hmdb_51_base_llm_labels.json
     novel_llm: labels/labels_froster/hmdb_51_novel_llm_labels.json
   ann_files:
+    # default
+    train: datasets_splits/hmdb_splits/train_hmdb51.txt
+    val: datasets_splits/hmdb_splits/val_hmdb51.txt
+    # Few-shot 
     few_shot_train: datasets_splits/hmdb_splits/train1_few_shot_${shot}.txt
     val1: datasets_splits/hmdb_splits/val1.txt
     val2: datasets_splits/hmdb_splits/val2.txt

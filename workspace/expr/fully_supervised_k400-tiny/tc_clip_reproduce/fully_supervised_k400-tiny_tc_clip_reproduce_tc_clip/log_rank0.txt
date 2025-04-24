@@ -1,0 +1,119 @@
+[04-24 10:36:13 TCCLIP] (main.py 252): INFO working dir: workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+[04-24 10:36:13 TCCLIP] (main.py 260): INFO [34m[1mDDP[0m with 2 GPUs
+[04-24 10:36:13 TCCLIP] (main.py 269): INFO Total batch size (512) = num_gpus (2) * batch_size (4) * accumulation_steps (64)
+[04-24 11:14:08 TCCLIP] (main.py 252): INFO working dir: workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+[04-24 11:14:08 TCCLIP] (main.py 260): INFO [34m[1mDDP[0m with 2 GPUs
+[04-24 11:14:08 TCCLIP] (main.py 269): INFO Total batch size (512) = num_gpus (2) * batch_size (4) * accumulation_steps (64)
+[04-24 11:21:32 TCCLIP] (main.py 252): INFO working dir: workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+[04-24 11:21:32 TCCLIP] (main.py 260): INFO [34m[1mDDP[0m with 2 GPUs
+[04-24 11:21:32 TCCLIP] (main.py 269): INFO Total batch size (512) = num_gpus (2) * batch_size (4) * accumulation_steps (64)
+[04-24 11:26:04 TCCLIP] (main.py 252): INFO working dir: workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+[04-24 11:26:04 TCCLIP] (main.py 260): INFO [34m[1mDDP[0m with 2 GPUs
+[04-24 11:26:04 TCCLIP] (main.py 269): INFO Total batch size (512) = num_gpus (2) * batch_size (4) * accumulation_steps (64)
+[04-24 11:27:04 TCCLIP] (main.py 252): INFO working dir: workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+[04-24 11:27:04 TCCLIP] (main.py 260): INFO [34m[1mDDP[0m with 2 GPUs
+[04-24 11:27:04 TCCLIP] (main.py 269): INFO Total batch size (512) = num_gpus (2) * batch_size (4) * accumulation_steps (64)
+[04-24 11:29:04 TCCLIP] (main.py 252): INFO working dir: workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+[04-24 11:29:04 TCCLIP] (main.py 260): INFO [34m[1mDDP[0m with 2 GPUs
+[04-24 11:29:04 TCCLIP] (main.py 269): INFO Total batch size (512) = num_gpus (2) * batch_size (4) * accumulation_steps (64)
+[04-24 11:29:12 TCCLIP] (print_utils.py 41): INFO [34m[1mSelected Options[0m
+[04-24 11:29:12 TCCLIP] (print_utils.py 43): INFO 	-trainer: tc_clip
+[04-24 11:29:12 TCCLIP] (print_utils.py 43): INFO 	-optimizer: adamw
+[04-24 11:29:12 TCCLIP] (print_utils.py 43): INFO 	-logging: wandb
+[04-24 11:29:12 TCCLIP] (print_utils.py 43): INFO 	-data: fully_supervised_k400-tiny
+[04-24 11:29:12 TCCLIP] (print_utils.py 43): INFO 	-common: default
+[04-24 11:29:12 TCCLIP] (print_utils.py 43): INFO 	-aug: default_aug
+[04-24 11:29:12 TCCLIP] (print_utils.py 44): INFO [34m[1mOverrides[0m
+[04-24 11:29:12 TCCLIP] (print_utils.py 47): INFO 	-data: fully_supervised_k400-tiny
+[04-24 11:29:12 TCCLIP] (print_utils.py 47): INFO 	-output: workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+[04-24 11:29:12 TCCLIP] (print_utils.py 47): INFO 	-trainer: tc_clip
+[04-24 11:29:12 TCCLIP] (print_utils.py 47): INFO 	-use_wandb: true
+[04-24 11:29:12 TCCLIP] (print_utils.py 48): INFO 
+[04-24 11:29:12 TCCLIP] (build.py 75): INFO Building train dataloader
+[04-24 11:29:12 TCCLIP] (build.py 144): INFO Building val dataloader
+[04-24 11:29:12 TCCLIP] (build_trainer.py 56): INFO Loading CLIP (backbone: ViT-B/16)
+[04-24 11:29:16 TCCLIP] (build_trainer.py 59): INFO [34m[1mBuilding TCCLIP[0m
+[04-24 11:29:16 TCCLIP] (tc_clip_prompt_learner.py 54): INFO Video-conditional prompt learning
+[04-24 11:29:16 TCCLIP] (tc_clip_prompt_learner.py 55): INFO Initial context: "a photo of a"
+[04-24 11:29:16 TCCLIP] (tc_clip_prompt_learner.py 56): INFO Number of learnable text prompt vectors: 4
+[04-24 11:29:16 TCCLIP] (tc_clip_text_encoder.py 96): INFO Copy CLIP transformer 11th layer weights to prompt generation layer
+[04-24 11:29:16 TCCLIP] (tc_clip_text_encoder.py 106): INFO Prompt generation level: [11]
+[04-24 11:29:16 TCCLIP] (tc_clip_text_encoder.py 107): INFO Prompt generation stop grad: True
+[04-24 11:29:16 TCCLIP] (tc_clip.py 27): INFO Using context tokens from vision layer [11]
+[04-24 11:29:16 TCCLIP] (build_trainer.py 97): INFO ----------------------------------------------------
+[04-24 11:29:16 TCCLIP] (build_trainer.py 98): INFO Freezed Parameters
+[04-24 11:29:16 TCCLIP] (build_trainer.py 102): INFO ----------------------------------------------------
+[04-24 11:29:16 TCCLIP] (build_trainer.py 105): INFO Number of Parameters: 127.5M
+[04-24 11:29:16 TCCLIP] (optimizer.py 79): INFO Set initial lr to 10x of other parts
+[04-24 11:29:16 TCCLIP] (optimizer.py 80): INFO Initialize 2.20e-04 for params with keyword prompt_learner
+[04-24 11:29:16 TCCLIP] (optimizer.py 81): INFO Added:
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO prompt_learner.ctx
+[04-24 11:29:16 TCCLIP] (optimizer.py 79): INFO Set initial lr to 10x of other parts
+[04-24 11:29:16 TCCLIP] (optimizer.py 80): INFO Initialize 2.20e-04 for params with keyword prompt_generation
+[04-24 11:29:16 TCCLIP] (optimizer.py 81): INFO Added:
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.attn.in_proj_weight
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.attn.in_proj_bias
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.attn.out_proj.weight
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.attn.out_proj.bias
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_1.weight
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_1.bias
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_1_kv.weight
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_1_kv.bias
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.mlp.c_fc.weight
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.mlp.c_fc.bias
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.mlp.c_proj.weight
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.mlp.c_proj.bias
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_2.weight
+[04-24 11:29:16 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_2.bias
+[04-24 11:51:22 TCCLIP] (main.py 252): INFO working dir: workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+[04-24 11:51:22 TCCLIP] (main.py 260): INFO [34m[1mDDP[0m with 2 GPUs
+[04-24 11:51:22 TCCLIP] (main.py 269): INFO Total batch size (512) = num_gpus (2) * batch_size (4) * accumulation_steps (64)
+[04-24 11:51:28 TCCLIP] (print_utils.py 41): INFO [34m[1mSelected Options[0m
+[04-24 11:51:28 TCCLIP] (print_utils.py 43): INFO 	-trainer: tc_clip
+[04-24 11:51:28 TCCLIP] (print_utils.py 43): INFO 	-optimizer: adamw
+[04-24 11:51:28 TCCLIP] (print_utils.py 43): INFO 	-logging: wandb
+[04-24 11:51:28 TCCLIP] (print_utils.py 43): INFO 	-data: fully_supervised_k400-tiny
+[04-24 11:51:28 TCCLIP] (print_utils.py 43): INFO 	-common: default
+[04-24 11:51:28 TCCLIP] (print_utils.py 43): INFO 	-aug: default_aug
+[04-24 11:51:28 TCCLIP] (print_utils.py 44): INFO [34m[1mOverrides[0m
+[04-24 11:51:28 TCCLIP] (print_utils.py 47): INFO 	-data: fully_supervised_k400-tiny
+[04-24 11:51:28 TCCLIP] (print_utils.py 47): INFO 	-output: workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+[04-24 11:51:28 TCCLIP] (print_utils.py 47): INFO 	-trainer: tc_clip
+[04-24 11:51:28 TCCLIP] (print_utils.py 47): INFO 	-use_wandb: true
+[04-24 11:51:28 TCCLIP] (print_utils.py 48): INFO 
+[04-24 11:51:28 TCCLIP] (build.py 75): INFO Building train dataloader
+[04-24 11:51:28 TCCLIP] (build.py 144): INFO Building val dataloader
+[04-24 11:51:28 TCCLIP] (build_trainer.py 56): INFO Loading CLIP (backbone: ViT-B/16)
+[04-24 11:51:32 TCCLIP] (build_trainer.py 59): INFO [34m[1mBuilding TCCLIP[0m
+[04-24 11:51:32 TCCLIP] (tc_clip_prompt_learner.py 54): INFO Video-conditional prompt learning
+[04-24 11:51:32 TCCLIP] (tc_clip_prompt_learner.py 55): INFO Initial context: "a photo of a"
+[04-24 11:51:32 TCCLIP] (tc_clip_prompt_learner.py 56): INFO Number of learnable text prompt vectors: 4
+[04-24 11:51:32 TCCLIP] (tc_clip_text_encoder.py 96): INFO Copy CLIP transformer 11th layer weights to prompt generation layer
+[04-24 11:51:32 TCCLIP] (tc_clip_text_encoder.py 106): INFO Prompt generation level: [11]
+[04-24 11:51:32 TCCLIP] (tc_clip_text_encoder.py 107): INFO Prompt generation stop grad: True
+[04-24 11:51:32 TCCLIP] (tc_clip.py 27): INFO Using context tokens from vision layer [11]
+[04-24 11:51:32 TCCLIP] (build_trainer.py 97): INFO ----------------------------------------------------
+[04-24 11:51:32 TCCLIP] (build_trainer.py 98): INFO Freezed Parameters
+[04-24 11:51:32 TCCLIP] (build_trainer.py 102): INFO ----------------------------------------------------
+[04-24 11:51:32 TCCLIP] (build_trainer.py 105): INFO Number of Parameters: 127.5M
+[04-24 11:51:32 TCCLIP] (optimizer.py 79): INFO Set initial lr to 10x of other parts
+[04-24 11:51:32 TCCLIP] (optimizer.py 80): INFO Initialize 2.20e-04 for params with keyword prompt_learner
+[04-24 11:51:32 TCCLIP] (optimizer.py 81): INFO Added:
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO prompt_learner.ctx
+[04-24 11:51:32 TCCLIP] (optimizer.py 79): INFO Set initial lr to 10x of other parts
+[04-24 11:51:32 TCCLIP] (optimizer.py 80): INFO Initialize 2.20e-04 for params with keyword prompt_generation
+[04-24 11:51:32 TCCLIP] (optimizer.py 81): INFO Added:
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.attn.in_proj_weight
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.attn.in_proj_bias
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.attn.out_proj.weight
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.attn.out_proj.bias
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_1.weight
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_1.bias
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_1_kv.weight
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_1_kv.bias
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.mlp.c_fc.weight
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.mlp.c_fc.bias
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.mlp.c_proj.weight
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.mlp.c_proj.bias
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_2.weight
+[04-24 11:51:32 TCCLIP] (optimizer.py 83): INFO text_encoder.prompt_generation_layer.0.ln_2.bias

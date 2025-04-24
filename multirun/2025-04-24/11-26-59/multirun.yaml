@@ -1,0 +1,382 @@
+hydra:
+  run:
+    dir: .
+  sweep:
+    dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  launcher:
+    _target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
+  sweeper:
+    _target_: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
+    max_batch_size: null
+    params: null
+  help:
+    app_name: ${hydra.job.name}
+    header: '${hydra.help.app_name} is powered by Hydra.
+
+      '
+    footer: 'Powered by Hydra (https://hydra.cc)
+
+      Use --hydra-help to view Hydra specific help
+
+      '
+    template: '${hydra.help.header}
+
+      == Configuration groups ==
+
+      Compose your configuration from those groups (group=option)
+
+
+      $APP_CONFIG_GROUPS
+
+
+      == Config ==
+
+      Override anything in the config (foo.bar=value)
+
+
+      $CONFIG
+
+
+      ${hydra.help.footer}
+
+      '
+  hydra_help:
+    template: 'Hydra (${hydra.runtime.version})
+
+      See https://hydra.cc for more info.
+
+
+      == Flags ==
+
+      $FLAGS_HELP
+
+
+      == Configuration groups ==
+
+      Compose your configuration from those groups (For example, append hydra/job_logging=disabled
+      to command line)
+
+
+      $HYDRA_CONFIG_GROUPS
+
+
+      Use ''--cfg hydra'' to Show the Hydra config.
+
+      '
+    hydra_help: ???
+  hydra_logging:
+    version: 1
+    formatters:
+      simple:
+        format: '[%(asctime)s][HYDRA] %(message)s'
+    handlers:
+      console:
+        class: logging.StreamHandler
+        formatter: simple
+        stream: ext://sys.stdout
+    root:
+      level: INFO
+      handlers:
+      - console
+    loggers:
+      logging_example:
+        level: DEBUG
+    disable_existing_loggers: false
+  job_logging:
+    version: 1
+    formatters:
+      simple:
+        format: '[%(asctime)s][%(name)s][%(levelname)s] - %(message)s'
+    handlers:
+      console:
+        class: logging.StreamHandler
+        formatter: simple
+        stream: ext://sys.stdout
+      file:
+        class: logging.FileHandler
+        formatter: simple
+        filename: ${hydra.runtime.output_dir}/${hydra.job.name}.log
+    root:
+      level: INFO
+      handlers:
+      - console
+      - file
+    disable_existing_loggers: false
+  env: {}
+  mode: MULTIRUN
+  searchpath: []
+  callbacks: {}
+  output_subdir: null
+  overrides:
+    hydra: []
+    task:
+    - data=fully_supervised_k400-tiny
+    - output=workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+    - trainer=tc_clip
+    - use_wandb=true
+  job:
+    name: main
+    chdir: null
+    override_dirname: data=fully_supervised_k400-tiny,output=workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip,trainer=tc_clip,use_wandb=true
+    id: ???
+    num: ???
+    config_name: fully_supervised
+    env_set: {}
+    env_copy: []
+    config:
+      override_dirname:
+        kv_sep: '='
+        item_sep: ','
+        exclude_keys: []
+  runtime:
+    version: 1.3.2
+    version_base: '1.3'
+    cwd: /projets/Knguetche/tc-clip
+    config_sources:
+    - path: hydra.conf
+      schema: pkg
+      provider: hydra
+    - path: /projets/Knguetche/tc-clip/configs
+      schema: file
+      provider: main
+    - path: ''
+      schema: structured
+      provider: schema
+    output_dir: ???
+    choices:
+      trainer: tc_clip
+      optimizer: adamw
+      logging: wandb
+      hydra_configs: default_hydra
+      data: fully_supervised_k400-tiny
+      common: default
+      aug: default_aug
+      hydra/env: default
+      hydra/callbacks: null
+      hydra/job_logging: default
+      hydra/hydra_logging: default
+      hydra/hydra_help: default
+      hydra/help: default
+      hydra/sweeper: basic
+      hydra/launcher: basic
+      hydra/output: default
+  verbose: false
+aug:
+  label_smooth: 0.1
+  color_jitter: 0.8
+  gray_scale: 0.2
+  mixup: 0.8
+  cutmix: 1.0
+  mixup_switch_prob: 0.5
+shot: null
+base: null
+k400:
+  dataset_name: kinetics400
+  root: ../kinetics_resized/k400/
+  num_classes:
+    default: 400
+    base: 200
+    novel: 200
+    temporal: 32
+    static: 32
+  label_files:
+    default: labels/kinetics_400_labels.csv
+    mini: labels/kinetics_400_mini200_labels.csv
+    base: labels/kinetics_400_base_labels.csv
+    novel: labels/kinetics_400_novel_labels.csv
+    temporal: labels/labels_temporal_static/kinetics_400_temporal32_labels.csv
+    static: labels/labels_temporal_static/kinetics_400_static32_labels.csv
+    llm: labels/labels_froster/kinetics_400_llm_labels.json
+    base_llm: labels/labels_froster/kinetics_400_base_llm_labels.json
+    novel_llm: labels/labels_froster/kinetics_400_novel_llm_labels.json
+  ann_files:
+    train: datasets_splits/k400_splits/train.txt
+    train_tiny: datasets_splits/k400_splits/train_tiny.txt
+    val: datasets_splits/k400_splits/val.txt
+    base_train: datasets_splits/base2novel_splits/k400_splits/fs_base_s${base}_train.txt
+    base_val: datasets_splits/base2novel_splits/k400_splits/base_val.txt
+    novel_val: datasets_splits/base2novel_splits/k400_splits/novel_val.txt
+    temporal_train: datasets_splits/temporal_static_splits/k400_splits/train_temporal32.txt
+    static_train: datasets_splits/temporal_static_splits/k400_splits/train_static32.txt
+    temporal_val: datasets_splits/temporal_static_splits/k400_splits/val_temporal32.txt
+    static_val: datasets_splits/temporal_static_splits/k400_splits/val_static32.txt
+    temporal_vis4: datasets_splits/temporal_static_splits/k400_splits/val_temporal32_vis4.txt
+    static_vis4: datasets_splits/temporal_static_splits/k400_splits/val_static32_vis4.txt
+k600:
+  dataset_name: kinetics600
+  root: /YOUR/PATH/TO/DATASET/k600
+  num_classes:
+    default: 160
+  label_files:
+    val1: labels/ZS_split1_K600.csv
+    val2: labels/ZS_split2_K600.csv
+    val3: labels/ZS_split3_K600.csv
+    val1_llm: labels/labels_froster/ZS_split1_K600_llm.json
+    val2_llm: labels/labels_froster/ZS_split2_K600_llm.json
+    val3_llm: labels/labels_froster/ZS_split3_K600_llm.json
+  ann_files:
+    val1: datasets_splits/k600_splits/ZS_split1_K600_eval.txt
+    val2: datasets_splits/k600_splits/ZS_split2_K600_eval.txt
+    val3: datasets_splits/k600_splits/ZS_split3_K600_eval.txt
+hmdb51:
+  dataset_name: hmdb51
+  root: /YOUR/PATH/TO/DATASET/hmdb51
+  num_classes:
+    default: 51
+    base: 26
+    novel: 25
+  label_files:
+    default: labels/hmdb_51_labels.csv
+    base: labels/hmdb_51_base_labels.csv
+    novel: labels/hmdb_51_novel_labels.csv
+    llm: labels/labels_froster/hmdb_51_llm_labels.json
+    base_llm: labels/labels_froster/hmdb_51_base_llm_labels.json
+    novel_llm: labels/labels_froster/hmdb_51_novel_llm_labels.json
+  ann_files:
+    few_shot_train: datasets_splits/hmdb_splits/train1_few_shot_${shot}.txt
+    val1: datasets_splits/hmdb_splits/val1.txt
+    val2: datasets_splits/hmdb_splits/val2.txt
+    val3: datasets_splits/hmdb_splits/val3.txt
+    base_train: datasets_splits/base2novel_splits/hmdb_splits/fs_base_s${base}_train.txt
+    base_val: datasets_splits/base2novel_splits/hmdb_splits/base_val.txt
+    novel_val: datasets_splits/base2novel_splits/hmdb_splits/novel_val.txt
+ucf101:
+  dataset_name: ucf101
+  root: /YOUR/PATH/TO/DATASET/ucf101
+  num_classes:
+    default: 101
+    base: 51
+    novel: 50
+  label_files:
+    default: labels/ucf_101_labels.csv
+    base: labels/ucf_101_base_labels.csv
+    novel: labels/ucf_101_novel_labels.csv
+    llm: labels/labels_froster/ucf_101_llm_labels.json
+    base_llm: labels/labels_froster/ucf_101_base_llm_labels.json
+    novel_llm: labels/labels_froster/ucf_101_novel_llm_labels.json
+  ann_files:
+    few_shot_train: datasets_splits/ucf_splits/train1_few_shot_${shot}.txt
+    val1: datasets_splits/ucf_splits/val1.txt
+    val2: datasets_splits/ucf_splits/val2.txt
+    val3: datasets_splits/ucf_splits/val3.txt
+    base_train: datasets_splits/base2novel_splits/ucf_splits/fs_base_s${base}_train.txt
+    base_val: datasets_splits/base2novel_splits/ucf_splits/base_val.txt
+    novel_val: datasets_splits/base2novel_splits/ucf_splits/novel_val.txt
+ssv2:
+  dataset_name: ssv2
+  root: /YOUR/PATH/TO/DATASET/ssv2
+  num_classes:
+    default: 174
+    base: 87
+    novel: 87
+    temporal: 18
+    static: 16
+  label_files:
+    default: labels/ssv2_labels.csv
+    base: labels/ssv2_174_base_labels.csv
+    novel: labels/ssv2_174_novel_labels.csv
+    temporal: labels/labels_temporal_static/ssv2_temporal18_labels.csv
+    static: labels/labels_temporal_static/ssv2_static16_labels.csv
+  ann_files:
+    train: datasets_splits/ssv2_splits/train.txt
+    few_shot_train: datasets_splits/ssv2_splits/train1_few_shot_${shot}.txt
+    val: datasets_splits/ssv2_splits/validation.txt
+    base_train: datasets_splits/base2novel_splits/ssv2_splits/fs_base_s${base}_train.txt
+    base_val: datasets_splits/base2novel_splits/ssv2_splits/base_val.txt
+    novel_val: datasets_splits/base2novel_splits/ssv2_splits/novel_val.txt
+    temporal_train: datasets_splits/temporal_static_splits/ssv2_splits/train_temporal18.txt
+    static_train: datasets_splits/temporal_static_splits/ssv2_splits/train_static16.txt
+    temporal_val: datasets_splits/temporal_static_splits/ssv2_splits/validation_temporal18.txt
+    static_val: datasets_splits/temporal_static_splits/ssv2_splits/validation_static16.txt
+parse_ucf101: true
+data:
+  train:
+    dataset_name: k400_train
+    root: ${k400.root}
+    num_classes: ${k400.num_classes.default}
+    label_file: ${k400.label_files.default}
+    ann_file: ${k400.ann_files.train_tiny}
+  val:
+    dataset_name: k400_val
+    root: ${k400.root}
+    num_classes: ${k400.num_classes.default}
+    label_file: ${k400.label_files.default}
+    ann_file: ${k400.ann_files.val}
+  test:
+  - name: k400_val
+    protocol: top1
+    dataset_list:
+    - dataset_name: k400_val
+      root: ${k400.root}
+      num_classes: ${k400.num_classes.default}
+      label_file: ${k400.label_files.default}
+      ann_file: ${k400.ann_files.val}
+resolve: true
+wandb_api_key: ${env:WANDB_API_KEY}
+wandb_project: TC-CLIP
+wandb_logging_dir: ${output}/wandb
+wandb_tags:
+- ${protocol}
+- ${selected_option.data}
+- ${model_arch}
+optimizer: adamw
+betas:
+- 0.9
+- 0.98
+weight_decay: 0.001
+lr_scheduler: cosine
+trainer_name: TCCLIP
+vision_model: TCVisionTransformer
+vision_block: TCAttentionBlock
+text_block: ResidualAttentionBlock
+use_custom_attention: true
+model_arch: ViT-B/16
+patch_size: 16
+freeze: null
+lr_10x: true
+positional_embedding_type: space
+local_global_bias: true
+context_token_k: 96
+seed_token_a: 0.3
+tome_r: 100
+tome_d: 0
+n_ctx: 4
+ctx_init: a photo of a
+im_stop_grad: true
+prompt_generation_layer_init: clip
+prompt_generation_layer_level: 12
+context_length: 30
+protocol: fully_supervised
+resume: null
+output: workspace/expr/fully_supervised_k400-tiny/tc_clip_reproduce/fully_supervised_k400-tiny_tc_clip_reproduce_tc_clip
+eval: null
+use_wandb: true
+epochs: 30
+warmup_epochs: 5
+lr: 2.2e-05
+lr_min: 2.2e-07
+total_batch_size: 512
+batch_size: 4
+accumulation_steps: 32
+test_batch_size: 8
+num_workers: 8
+pin_memory: true
+worker_init_fn: true
+input_size: 224
+num_frames: 16
+num_clip: 1
+num_crop: 1
+multi_view_inference: true
+seed: 1024
+distributed: true
+use_cudnn: true
+opt_level: O1
+auto_resume: false
+save_freq: 1
+save_intermediate: true
+print_freq: 50
+final_test: true
+early_stop: false
+selected_option: ${hydra:runtime.choices}
+overriden_values: ${hydra:overrides}

@@ -1,7 +1,7 @@
 #@package _global_
-wandb_api_key: /YOUR/WANDB/API/KEY
+wandb_api_key: 9c3736066961071dcf063fc529377c189e5029c5
 wandb_project: TC-CLIP
-wandb_logging_dir: /YOUR/PATH/TO/WANDB/OFFLINE/LOGGING/DIR
+wandb_logging_dir: ./wandb
 wandb_tags:
   - ${protocol}
   - ${selected_option.data}
