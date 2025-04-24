@@ -127,8 +127,7 @@ def build_train_dataloader(logger, config):
 
     train_loader = DataLoader(
         train_data, sampler=sampler_train,
-        #batch_size=config.batch_size,
-        batch_size=8,
+        batch_size=config.batch_size,
         num_workers=num_workers,
         pin_memory=pin_memory,
         drop_last=True,
@@ -193,8 +192,7 @@ def build_val_dataloader(logger, config, target_data_config):
 
     val_loader = DataLoader(
         val_data, sampler=sampler_val,
-        #batch_size=config.test_batch_size,
-        batch_size=8,
+        batch_size=config.test_batch_size,
         num_workers=num_workers,
         pin_memory=pin_memory,
         drop_last=False,
