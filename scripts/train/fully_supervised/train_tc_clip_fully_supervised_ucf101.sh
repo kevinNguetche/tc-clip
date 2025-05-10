@@ -1,9 +1,9 @@
-# fully-supervised hmdb51 training with 2 V100 gpus
+# fully-supervised ucf101 training with 2 V100 gpus
 export CUDA_VISIBLE_DEVICES=0,1
 export GPUS_PER_NODE=2
 
 protocol=fully_supervised
-dataset_name=hmdb51
+dataset_name=ucf101
 data=${protocol}_${dataset_name}
 
 expr_name=tc_clip_reproduce

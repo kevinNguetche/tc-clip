@@ -105,9 +105,9 @@ ucf101:
     novel_llm: labels/labels_froster/ucf_101_novel_llm_labels.json
   ann_files:
     # default
-    train: datasets_splits/ucf_splits/trainlist01_shifted.txt
-    val: datasets_splits/ucf_splits/testlist01_labeled.txt
-    # Few-shot 
+    train: datasets_splits/ucf_splits/trainlist03_shifted.txt
+    val: datasets_splits/ucf_splits/testlist03_labeled.txt
+    # Few-shot
     few_shot_train: datasets_splits/ucf_splits/train1_few_shot_${shot}.txt
     val1: datasets_splits/ucf_splits/val1.txt
     val2: datasets_splits/ucf_splits/val2.txt
