@@ -11,7 +11,7 @@ from torch import nn
 from clip.model_utils import LayerNorm
 from clip.transformer import Transformer
 
-from tome.utils import parse_r
+from pitome.utils import parse_keep_ratio  # switched from tome.utils
 
 
 class TCVisionTransformer(nn.Module):
@@ -25,10 +25,8 @@ class TCVisionTransformer(nn.Module):
         self.class_embedding = nn.Parameter(scale * torch.randn(width))
         self.pos_emb_type = design_details["positional_embedding_type"]
         if self.pos_emb_type == "space":
-            print("Using spatial positional embedding")
             self.positional_embedding = nn.Parameter(scale * torch.randn((input_resolution // patch_size) ** 2 + 1, width))
         elif self.pos_emb_type == "joint":
-            print("Using joint spatio-temporal positional embedding")
             self.positional_embedding = nn.Parameter(scale * torch.randn(num_frames,
                                                                          (input_resolution // patch_size) ** 2 + 1, width))
         else:
@@ -39,25 +37,22 @@ class TCVisionTransformer(nn.Module):
         self.ln_post = LayerNorm(width)
         self.proj = nn.Parameter(scale * torch.randn(width, output_dim))
 
+        # PiToMe scheduler ---------------------------------------------------
         self.num_layers = layers
-        self.tome_r = design_details["tome_r"]
-        self.tome_d = design_details["tome_d"]
+        self.pitome_ratio = design_details["tome_ratio"]   # # float | tuple | list
         self._tome_info = {
-            "r": self.tome_r,
+            "ratio": None,            # list[float] populated per forward
             "size": None,
             "source": None,
             "trace_source": False,
-            "prop_attn": False,
             "class_token": False,
-            "distill_token": False,
         }
 
+    # -------------- helper (unchanged) ----------------
     def add_positional_embedding(self, x, B, T):
         if self.pos_emb_type == "space":
-            # add same positional encoding for different timestep
             x = x + self.positional_embedding.to(x.dtype)
         elif self.pos_emb_type == "joint":
-            # add individual learnable positional encoding
             BT, N, width = x.size()
             x = x.reshape(B, T, N, width)
             x = x + self.positional_embedding.to(x.dtype)
@@ -66,36 +61,32 @@ class TCVisionTransformer(nn.Module):
             raise NotImplementedError
         return x
 
+    # ---------------- forward -------------------------
     def forward(self, x: torch.Tensor, return_layer_num=None, return_attention=False, return_source=False):
-        # patch encoding
-        B, T, C, H, W = x.size()
-        x = x.reshape(-1, C, H, W)
-        x = self.conv1(x)  # shape = [b*t, width, grid, grid]
-        x = x.reshape(x.shape[0], x.shape[1], -1)  # shape = [*, width, grid ** 2]
-        x = x.permute(0, 2, 1)  # shape = [*, grid ** 2, width]
-
-        # Concat cls embedding
-        x = torch.cat([self.class_embedding.to(x.dtype) + torch.zeros(x.shape[0], 1, x.shape[-1],
-                                                                      dtype=x.dtype, device=x.device), x], dim=1)
-
-        # add positional embedding
+        # (patchify + CLS + positional embedding) – unchanged
+        B, T, C, H, W = x.shape
+        x = self.conv1(x.reshape(-1, C, H, W))
+        x = x.reshape(x.size(0), x.size(1), -1).permute(0, 2, 1)
+        x = torch.cat([self.class_embedding.to(x.dtype).unsqueeze(0).expand(x.size(0), -1, -1), x], dim=1)
         x = self.add_positional_embedding(x, B, T)
         x = rearrange(x, '(B T) N D -> B (T N) D', B=B, T=T)
-
         x = self.ln_pre(x)
-        self._tome_info["r"] = parse_r(self.num_layers, (self.tome_r, self.tome_d))  # r scheduler
+
+        # build keep‑ratio list per layer
+        self._tome_info["ratio"] = parse_keep_ratio(self.num_layers, self.pitome_ratio)
         self._tome_info["size"] = None
         self._tome_info["source"] = None
         self._tome_info["trace_source"] = return_source
+
         x, attns, source = self.transformer.forward_tc(x,
                                                        tome_info=self._tome_info,
                                                        layer_num_list=return_layer_num,
                                                        return_attention=return_attention,
-                                                       return_source=return_source)  # [n_layer, B, n+k, 768]
-
+                                                       return_source=return_source)
         x = self.ln_post(x)
         if self.proj is not None:
             x = x @ self.proj
+
         cls_tokens = x[:, :, :T, :]
         context_tokens = x[:, :, T:, :]
         return cls_tokens, context_tokens, attns, source

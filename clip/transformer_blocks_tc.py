@@ -6,25 +6,32 @@ CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)
 
 from collections import OrderedDict
 from einops import rearrange
+from typing import Optional
 from timm.models.layers import trunc_normal_
 
 import torch
 from torch import nn
 
 from clip.model_utils import LayerNorm, QuickGELU
-from tome.merge import bipartite_soft_matching, merge_source, merge_wavg
-from tome.utils import schedule_r_constant
 
+from pitome.merge import pitome_vision, merge_source, merge_wavg   # ← PiToMe API
+from pitome.utils import parse_keep_ratio                            # ← new helper
 
 class TCAttentionBlock(nn.Module):
-    def __init__(self, d_model: int, n_head: int, attn_mask: torch.Tensor = None, i=0, design_details=None):
+    """Temporal‑Contextual block with PiToMe summarisation."""
+
+    def __init__(self, d_model: int, n_head: int, attn_mask: Optional[torch.Tensor] = None,
+                 i: int = 0, design_details: Optional[dict] = None):
         super().__init__()
-        self.T = design_details['temporal_length']
-        self.num_patches = 196
-        self.num_context_token = design_details['context_token_k']  # total number of context token
+        self.T = design_details['temporal_length']            # #frames per clip
+        self.num_patches = 196                                # fixed for ViT‑B/16
+        self.num_context_token = design_details['context_token_k']
         self.first_layer = (i == 0)
-        self.attn = TCAttention(d_model, n_head, first_layer=self.first_layer,
-                                T=self.T, seed_token_a=design_details["seed_token_a"],
+
+        self.attn = TCAttention(d_model, n_head,
+                                first_layer=self.first_layer,
+                                T=self.T,
+                                seed_token_a=design_details["seed_token_a"],
                                 local_global_bias=design_details['local_global_bias'])
         self.ln_1 = LayerNorm(d_model)
         self.mlp = nn.Sequential(OrderedDict([
@@ -35,56 +42,58 @@ class TCAttentionBlock(nn.Module):
         self.ln_2 = LayerNorm(d_model)
         self.attn_mask = attn_mask
 
-    def forward(self, x, tome_info, return_attention=False):
+    # --------------------------------------------------
+    def forward(self, x, tome_info: dict, *, return_attention: bool = False):
         B, T, D = x.size(0), self.T, x.size(2)
         N = 1 + self.num_patches
-        TN = T*N
+        TN = T * N
 
-        # TC-MHSA with seed index selection
+        # (1) MHSA with seed selection
         x_attn, seed_index, attn = self.attn(self.ln_1(x), return_attention=return_attention)
-        x = x[:, :TN, :] + x_attn  # B, TN, D
+        x = x[:, :TN, :] + x_attn  # residual
 
-        # Summarize context tokens
-        context_tokens = self.summarize_context_tokens(x, seed_index, tome_info=tome_info)    # [B, num_context_tokens, D]
+        # (2) PiToMe summarisation on seed tokens
+        context_tokens = self._summarize_context_tokens_pitome(x, seed_index, tome_info)
 
-        # FFN
+        # (3) FFN
         x = torch.cat([x, context_tokens], dim=1)
         x = x + self.mlp(self.ln_2(x))
         return x, attn
 
-    def summarize_context_tokens(self, x, index, tome_info):
-        # x: B, TN, D
-        # index: B, T, m
+    # --------------------------------------------------
+    def _summarize_context_tokens_pitome(self, x, seed_idx, tome_info):
+        """Aggregate per‑frame seed tokens into k context tokens via PiToMe."""
         B, T, N, D = x.size(0), self.T, x.size(1) // self.T, x.size(-1)
         patch_tokens = rearrange(x, 'B (T N) D -> B T N D', T=T, N=N)
-        patch_tokens = patch_tokens[:, :, 1:1+self.num_patches, :]     # x: {cls(1), patch_tokens(196)}
-        Np = patch_tokens.size(2)  # number of patch tokens in each frame (196)
-        Ns = index.size(2)         # number of seed tokens in each frame
+        patch_tokens = patch_tokens[:, :, 1:1 + self.num_patches, :]  # drop CLS
+        Np = patch_tokens.size(2)
+        Ns = seed_idx.size(2)
 
-        # Gather seed tokens from all frames
-        index_expand = torch.arange(T, device=x.device).unsqueeze(0).unsqueeze(2).repeat(B, 1, Ns)*Np
-        index_flatten = (index + index_expand).reshape(B, -1)
+        # Flatten indices so each seed has a unique position in [0, T* Np)
+        idx_offset = torch.arange(T, device=x.device).view(1, T, 1) * Np  # (1,T,1)
+        flat_idx = (seed_idx + idx_offset).reshape(B, -1)                 # (B, T*Ns)
+
         patch_tokens = rearrange(patch_tokens, 'B T Np D -> B (T Np) D')
-        seed_tokens = patch_tokens.gather(dim=1, index=index_flatten.unsqueeze(-1).expand(-1, -1, D))    # [B, T*Ns, D]
+        seed_tokens = patch_tokens.gather(1, flat_idx.unsqueeze(-1).expand(-1, -1, D))  # (B, T*Ns, D)
 
-        # Bipartite matching with seed tokens
-        default_r = tome_info["r"].pop(0)
-        r_schedule, cnt_schedule = schedule_r_constant(start_number=Ns * T, final_number=self.num_context_token, r=default_r)
-        tome_info['source'] = None
-        tome_info['size'] = None
-        for i, r in enumerate(r_schedule):
-            metric = seed_tokens.clone()
-            merge, _ = bipartite_soft_matching(metric, r, tome_info["class_token"], tome_info["distill_token"])
-            if tome_info['trace_source']:
-                tome_info['source'] = merge_source(merge, seed_tokens, tome_info['source'])
-            seed_tokens, tome_info['size'] = merge_wavg(merge, seed_tokens, tome_info["size"])
-        context_tokens = seed_tokens
+        # ---- PiToMe merge ----
+        keep_ratio = tome_info["ratio"].pop(0)          # float in (0,1]
+        keep_ratio = float(max(1e-2, min(0.95, keep_ratio)))
+        merge_fn = pitome_vision(metric=seed_tokens, ratio=keep_ratio, class_token=False)
 
-        # Convert source matrix to original T*num_patches
         if tome_info['trace_source']:
-            source_all = torch.zeros(B, context_tokens.size(1), T * Np, device=x.device)
-            source_all.scatter_(dim=2, index=index_flatten.unsqueeze(1).expand(-1, seed_tokens.size(1), -1), src=tome_info['source'])
-            tome_info['source'] = source_all
+            tome_info['source'] = merge_source(merge_fn, seed_tokens, tome_info['source'])
+        # we do a single PiToMe merge; size bookkeeping is unnecessary across layers
+        seed_tokens, _ = merge_wavg(merge_fn, seed_tokens, None)
+        # reset size so subsequent blocks start fresh
+        tome_info['size'] = None
+        context_tokens = seed_tokens  # now of shape (B, k, D) with k ≈ keep_ratio * T*Ns
+        
+        # map back to original patch index space
+        if tome_info['trace_source']:
+            source_full = torch.zeros(B, context_tokens.size(1), T * Np, device=x.device)
+            source_full.scatter_(2, flat_idx.unsqueeze(1).expand(-1, context_tokens.size(1), -1), tome_info['source'])
+            tome_info['source'] = source_full
         return context_tokens
 
 

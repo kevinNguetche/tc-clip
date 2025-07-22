@@ -20,35 +20,34 @@ def load_clip_to_cpu(cfg):
     backbone_name = cfg.model_arch
     url = clip._MODELS[backbone_name]
     model_path = clip._download(url)
-
     try:
-        # loading JIT archive
         model = torch.jit.load(model_path, map_location="cpu").eval()
         state_dict = None
     except RuntimeError:
         state_dict = torch.load(model_path, map_location="cpu")
 
-    design_details = {"vision_model": cfg.get("vision_model", "VisionTransformer"),
-                      "vision_block": cfg.get("vision_block", "ResidualAttentionBlock"),
-                      "text_block": cfg.get("text_block", "ResidualAttentionBlock"),
-                      "use_custom_attention": cfg.get("use_custom_attention", False),
-                      "context_length": cfg.get("context_length", 77),
-                      "temporal_length": cfg.get("num_frames", 16),
-                      "vision_depth": cfg.get("prompt_depth_vision", 0),
-                      "language_depth": cfg.get("prompt_depth_text", 1),
-                      "vision_ctx": cfg.get('n_ctx_vision', 0),
-                      "language_ctx": cfg.get('n_ctx_text', 0),
-                      # TC-CLIP
-                      "positional_embedding_type": cfg.get("positional_embedding_type", "space"),
-                      "local_global_bias": cfg.get("local_global_bias", True),
-                      "context_token_k": cfg.get("context_token_k", 96),
-                      "seed_token_a": cfg.get("seed_token_a", 0.3),
-                      "tome_r": cfg.get("tome_r", 100),
-                      "tome_d": cfg.get("tome_d", 0)
-                      }
+    design_details = {
+        # unchanged fields ↓
+        "vision_model": cfg.get("vision_model", "VisionTransformer"),
+        "vision_block": cfg.get("vision_block", "ResidualAttentionBlock"),
+        "text_block": cfg.get("text_block", "ResidualAttentionBlock"),
+        "use_custom_attention": cfg.get("use_custom_attention", False),
+        "context_length": cfg.get("context_length", 77),
+        "temporal_length": cfg.get("num_frames", 16),
+        "vision_depth": cfg.get("prompt_depth_vision", 0),
+        "language_depth": cfg.get("prompt_depth_text", 1),
+        "vision_ctx": cfg.get('n_ctx_vision', 0),
+        "language_ctx": cfg.get('n_ctx_text', 0),
+        # TC‑CLIP specifics ↓
+        "positional_embedding_type": cfg.get("positional_embedding_type", "space"),
+        "local_global_bias": cfg.get("local_global_bias", True),
+        "context_token_k": cfg.get("context_token_k", 96),
+        "seed_token_a": cfg.get("seed_token_a", 0.3),
+        # ---- PiToMe schedule ----
+        "tome_ratio": cfg.get("tome_ratio", 0.7)  # keep‑ratio (float 0‑1, tuple, or list)
+    }
 
     model = clip.build_model(state_dict or model.state_dict(), design_details)
-
     return model
 
 
