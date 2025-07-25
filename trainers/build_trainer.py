@@ -44,7 +44,7 @@ def load_clip_to_cpu(cfg):
         "context_token_k": cfg.get("context_token_k", 96),
         "seed_token_a": cfg.get("seed_token_a", 0.3),
         # ---- PiToMe schedule ----
-        "tome_ratio": cfg.get("tome_ratio", 0.975)  # keep‑ratio (float 0‑1, tuple, or list)
+        "tome_ratio": cfg.get("tome_ratio", 0.7)  # keep‑ratio (float 0‑1, tuple, or list)
     }
 
     model = clip.build_model(state_dict or model.state_dict(), design_details)
