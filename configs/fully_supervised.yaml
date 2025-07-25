@@ -40,7 +40,7 @@ seed: 1024
 distributed: true
 use_cudnn: true
 opt_level: O1
-auto_resume: false
+auto_resume: true
 save_freq: 5
 save_intermediate: true   # save intermediate checkpoint
 print_freq: 100
